@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Shopping Cart - AcheteLicense{% endblock %}
+{% block content %}
+<section class="cart-page">
+    <div class="cart-header">
+        <h1><i class="fas fa-shopping-cart"></i> Shopping Cart</h1>
+    </div>
+    <div class="cart-container" id="cartContainer">
+        <div class="cart-loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading cart...
+        </div>
+    </div>
+    <div class="cart-actions" id="cartActions" style="display:none;">
+        <a href="{{ url_for('shop') }}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+        <a href="{{ url_for('checkout') }}" class="btn btn-primary"><i class="fas fa-credit-card"></i> Proceed to Checkout</a>
+    </div>
+    <div class="cart-empty" id="cartEmpty" style="display:none;">
+        <i class="fas fa-shopping-cart"></i>
+        <h3>Your cart is empty</h3>
+        <p>Browse our products and find something you like!</p>
+        <a href="{{ url_for('shop') }}" class="btn btn-primary"><i class="fas fa-store"></i> Start Shopping</a>
+    </div>
+</section>
+{% endblock %}

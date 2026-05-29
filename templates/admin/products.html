@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Manage Products - AcheteLicense{% endblock %}
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-box"></i> Products Management</h1>
+        <a href="{{ url_for('add_product') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add New Product</a>
+    </div>
+
+    <div class="admin-section">
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Keys</th>
+                        <th>License</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            <img src="{{ url_for('uploaded_file', filename=product.image_file) if product.image_file != 'default.png' else 'https://placehold.co/60x60/1a1a2e/e94560?text=' + product.name[0]|upper }}"
+                                 alt="{{ product.name }}" class="product-thumb"
+                                 onerror="this.src='https://placehold.co/60x60/1a1a2e/e94560?text=P'">
+                        </td>
+                        <td><strong>{{ product.name }}</strong></td>
+                        <td><span class="category-tag">{{ product.category }}</span></td>
+                        <td>DH {{ "%.2f"|format(product.price) }}</td>
+                        <td>
+                            <span class="stock-indicator {% if product.available_keys_count <= 3 %}stock-low{% elif product.available_keys_count <= 10 %}stock-medium{% else %}stock-high{% endif %}">
+                                {{ product.available_keys_count }}
+                            </span>
+                            <small style="display:block;color:var(--text-muted);font-size:0.75rem;">
+                                {{ product.sold_keys_count }} sold
+                            </small>
+                        </td>
+                        <td>{{ product.license_type|title }}</td>
+                        <td>
+                            <span class="status status-{{ 'active' if product.is_active else 'inactive' }}">
+                                {{ 'Active' if product.is_active else 'Inactive' }}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <a href="{{ url_for('admin_product_keys', id=product.id) }}" class="btn-sm" style="background:rgba(108,92,231,0.15);color:var(--primary);border:none;cursor:pointer;" title="Manage Keys">
+                                <i class="fas fa-key"></i>
+                            </a>
+                            <a href="{{ url_for('edit_product', id=product.id) }}" class="btn-sm btn-edit" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ url_for('toggle_product', id=product.id) }}" class="btn-sm btn-toggle" title="Toggle Status">
+                                <i class="fas fa-{{ 'eye' if product.is_active else 'eye-slash' }}"></i>
+                            </a>
+                            <a href="{{ url_for('delete_product', id=product.id) }}" class="btn-sm btn-delete" title="Delete"
+                               onclick="return confirm('Delete this product?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="empty-cell">
+                            <i class="fas fa-box-open"></i>
+                            <p>No products yet. <a href="{{ url_for('add_product') }}">Add your first product</a></p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

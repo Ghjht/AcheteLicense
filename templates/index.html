@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}AcheteLicense - Premium Digital Licenses{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-badge"><i class="fas fa-shield-alt"></i> 100% Secure Platform</span>
+        <h1 class="hero-title">Premium Digital <span class="gradient-text">Licenses</span></h1>
+        <p class="hero-subtitle">Discover and purchase authentic licenses for software, games, music, and design assets at unbeatable prices. Instant delivery, guaranteed.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('shop') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-shopping-bag"></i> Browse Products
+            </a>
+            <a href="#features" class="btn btn-outline btn-lg">
+                <i class="fas fa-play-circle"></i> How It Works
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-number">10K+</span>
+                <span class="stat-label">Licenses Sold</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">500+</span>
+                <span class="stat-label">Products</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">99.9%</span>
+                <span class="stat-label">Satisfaction</span>
+            </div>
+        </div>
+    </div>
+    <div class="hero-visual">
+        <div class="hero-shape"></div>
+        <div class="hero-card">
+            <i class="fas fa-certificate"></i>
+            <div class="hero-card-text">
+                <strong>Verified License</strong>
+                <span>100% Authentic</span>
+            </div>
+        </div>
+        <div class="hero-card hero-card-2">
+            <i class="fas fa-bolt"></i>
+            <div class="hero-card-text">
+                <strong>Instant Delivery</strong>
+                <span>Via Email</span>
+            </div>
+        </div>
+        <div class="hero-card hero-card-3">
+            <i class="fas fa-headset"></i>
+            <div class="hero-card-text">
+                <strong>24/7 Support</strong>
+                <span>We're here to help</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="features">
+    <div class="section-header">
+        <h2>Why Choose <span class="gradient-text">AcheteLicense?</span></h2>
+        <p>We provide the best digital license marketplace experience</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3>Secure Transactions</h3>
+            <p>Your purchases are protected with enterprise-grade encryption and secure payment processing.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+            <h3>Instant Delivery</h3>
+            <p>Get your license keys instantly after purchase via email and your account dashboard.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-check-circle"></i></div>
+            <h3>100% Authentic</h3>
+            <p>All licenses are verified and sourced directly from official distributors and publishers.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-headset"></i></div>
+            <h3>24/7 Customer Support</h3>
+            <p>Our dedicated support team is always available to assist you with any questions.</p>
+        </div>
+    </div>
+</section>
+
+<section class="featured-products">
+    <div class="section-header">
+        <h2>Featured <span class="gradient-text">Products</span></h2>
+        <p>Most popular digital licenses this week</p>
+    </div>
+    <div class="products-grid">
+        {% for product in products %}
+        <div class="product-card" data-id="{{ product.id }}">
+            <div class="product-image">
+                <img src="{{ url_for('uploaded_file', filename=product.image_file) if product.image_file != 'default.png' else 'https://placehold.co/400x300/1a1a2e/e94560?text=' + product.name|urlencode }}"
+                     alt="{{ product.name }}"
+                     onerror="this.src='https://placehold.co/400x300/1a1a2e/e94560?text=Product'">
+                <span class="product-badge">{{ product.category }}</span>
+                {% if product.quantity <= 3 %}
+                    <span class="product-badge stock-badge">Low Stock</span>
+                {% endif %}
+            </div>
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="product-desc">{{ product.description[:80] if product.description else 'Premium digital license' }}{% if product.description and product.description|length > 80 %}...{% endif %}</p>
+                <div class="product-meta">
+                    <span class="product-license"><i class="fas fa-tag"></i> {{ product.license_type|title }} License</span>
+                </div>
+                <div class="product-bottom">
+                    <span class="product-price">DH {{ "%.2f"|format(product.price) }}</span>
+                    <button class="btn-add-cart" onclick="addToCart({{ product.id }})">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if products|length == 0 %}
+    <div class="empty-state">
+        <i class="fas fa-box-open"></i>
+        <h3>No Products Yet</h3>
+        <p>Check back soon for new digital licenses!</p>
+    </div>
+    {% endif %}
+    <div class="section-action">
+        <a href="{{ url_for('shop') }}" class="btn btn-primary">View All Products <i class="fas fa-arrow-right"></i></a>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Get Your <span class="gradient-text">Digital License?</span></h2>
+        <p>Join thousands of satisfied customers who trust AcheteLicense for their digital product needs.</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-user-plus"></i> Get Started Free
+        </a>
+    </div>
+</section>
+{% endblock %}

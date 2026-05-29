@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Edit User - AcheteLicense{% endblock %}
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-user-edit"></i> Edit User: {{ user.username }}</h1>
+        <a href="{{ url_for('admin_users') }}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Users</a>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" class="admin-form">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Username</label>
+                <input type="text" name="username" value="{{ user.username }}" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" name="email" value="{{ user.email }}" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> New Password</label>
+                <input type="password" name="password" placeholder="Leave blank to keep current">
+                <small style="color:var(--text-muted);">Leave empty to keep current password.</small>
+            </div>
+            <div class="form-info" style="margin-bottom:20px;">
+                <i class="fas fa-info-circle"></i>
+                Role: {% if user.is_admin %}<strong>Admin</strong>{% else %}<strong>User</strong>{% endif %}
+                &middot; Registered: {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                <a href="{{ url_for('admin_users') }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

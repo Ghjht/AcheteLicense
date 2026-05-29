@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Users - AcheteLicense{% endblock %}
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-users"></i> Users Management</h1>
+        <div class="admin-actions">
+            <span class="text-muted">{{ users|length }} user{{ 's' if users|length != 1 else '' }}</span>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td><strong>{{ user.username }}</strong></td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                            <span class="status status-completed">Admin</span>
+                            {% else %}
+                            <span class="status status-pending">User</span>
+                            {% endif %}
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.85rem;">{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_edit_user', id=user.id) }}" class="btn-sm" style="background:rgba(108,92,231,0.15);color:var(--primary);border:none;cursor:pointer;padding:6px 12px;border-radius:6px;text-decoration:none;display:inline-block;">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            {% if not user.is_admin and user.id != current_user.id %}
+                            <form method="POST" action="{{ url_for('admin_delete_user', id=user.id) }}" style="display:inline;">
+                                <button type="submit" class="btn-sm" style="background:rgba(239,68,68,0.15);color:var(--error);border:none;cursor:pointer;padding:6px 12px;border-radius:6px;"
+                                        onclick="return confirm('Delete user {{ user.username }}? This cannot be undone.');">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="empty-cell">
+                            <i class="fas fa-users"></i>
+                            <p>No users found</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

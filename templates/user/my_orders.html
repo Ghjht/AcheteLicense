@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}My Orders - AcheteLicense{% endblock %}
+{% block content %}
+<section class="my-orders-page">
+    <div class="my-orders-header">
+        <div>
+            <h1><i class="fas fa-receipt"></i> My Orders</h1>
+            <p class="my-orders-subtitle">{{ orders|length }} order{{ 's' if orders|length != 1 else '' }}</p>
+        </div>
+        <a href="{{ url_for('shop') }}" class="btn btn-primary"><i class="fas fa-store"></i> Browse Products</a>
+    </div>
+
+    {% if orders %}
+    <div class="my-orders-table-wrap">
+        <table class="my-orders-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr class="my-order-row">
+                    <td class="my-td-order" data-label="Order ID">#{{ order.id }}</td>
+                    <td class="my-td-date" data-label="Date">{{ order.created_at.strftime('%b %d, %Y') }}<br><small>{{ order.created_at.strftime('%H:%M') }}</small></td>
+                    <td class="my-td-items" data-label="Product">
+                        {% for item in order.items %}
+                        <span>{{ item.product_name }} <span class="my-td-qty">x{{ item.quantity }}</span></span>
+                        {% endfor %}
+                    </td>
+                    <td class="my-td-total" data-label="Total">DH {{ "%.2f"|format(order.total_amount) }}</td>
+                    <td class="my-td-payment" data-label="Payment"><span class="my-badge-payment"><i class="fas fa-university"></i> Virement</span></td>
+                    <td class="my-td-status" data-label="Status">
+                        <span class="my-badge-status status-{{ order.status }}">
+                            {% if order.status == 'completed' %}
+                            <i class="fas fa-check-circle"></i> Confirmed
+                            {% elif order.status == 'pending' %}
+                            <i class="fas fa-clock"></i> Pending
+                            {% elif order.status == 'cancelled' %}
+                            <i class="fas fa-times-circle"></i> Cancelled
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td class="my-td-action" data-label="Actions">
+                        {% if order.status == 'completed' %}
+                        <a href="{{ url_for('download_invoice', order_id=order.id) }}" class="btn btn-outline btn-sm" target="_blank" title="Invoice">
+                            <i class="fas fa-file-invoice"></i>
+                        </a>
+                        {% else %}
+                        <span class="my-td-na">&mdash;</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if order.status == 'completed' and order.items|selectattr('license_key')|list %}
+                <tr class="my-keys-row">
+                    <td colspan="7" class="my-td-keys">
+                        <div class="my-keys-card">
+                            <div class="my-keys-card-header">
+                                <i class="fas fa-key"></i> License Keys
+                            </div>
+                            <div class="my-keys-card-body">
+                                {% for item in order.items %}
+                                    {% if item.license_key %}
+                                    {% set keys = item.license_key.split('\n') %}
+                                    <div class="my-keys-group">
+                                        <span class="my-keys-label">{{ item.product_name }} x{{ item.quantity }}</span>
+                                        {% for key in keys %}
+                                        <div class="my-keys-row-item">
+                                            <code class="my-keys-value">{{ key }}</code>
+                                            <button class="my-keys-copy" data-key="{{ key|e }}" title="Copy">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-receipt"></i>
+        <h3>No Orders Yet</h3>
+        <p>Start shopping to see your orders here!</p>
+        <a href="{{ url_for('shop') }}" class="btn btn-primary"><i class="fas fa-store"></i> Browse Products</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

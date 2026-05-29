@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Orders - AcheteLicense{% endblock %}
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-shopping-cart"></i> Orders Management</h1>
+        <div class="admin-actions">
+            <a href="{{ url_for('admin_products') }}" class="btn btn-outline"><i class="fas fa-box"></i> Products</a>
+        </div>
+    </div>
+
+    <div class="admin-search-bar">
+        <form method="GET" action="{{ url_for('admin_orders') }}" class="admin-search-form">
+            <div class="admin-search-input-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" name="q" placeholder="Search by order #, customer name, or email..." value="{{ query or '' }}">
+            </div>
+            <select name="status" class="admin-search-select">
+                <option value="">All statuses</option>
+                <option value="pending" {{ 'selected' if status_filter == 'pending' else '' }}>Pending</option>
+                <option value="completed" {{ 'selected' if status_filter == 'completed' else '' }}>Completed</option>
+                <option value="cancelled" {{ 'selected' if status_filter == 'cancelled' else '' }}>Cancelled</option>
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+            {% if query or status_filter %}
+            <a href="{{ url_for('admin_orders') }}" class="btn btn-outline btn-sm"><i class="fas fa-times"></i> Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="admin-section">
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Amount</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>
+                            <strong>{{ order.customer_name or 'Guest' }}</strong>
+                            <small style="display:block;color:var(--text-muted);">{{ order.customer_email }}</small>
+                        </td>
+                        <td>
+                            {% for item in order.items %}
+                                <span class="order-item-name">{{ item.product_name }} x{{ item.quantity }}</span><br>
+                            {% endfor %}
+                        </td>
+                        <td>DH {{ "%.2f"|format(order.total_amount) }}</td>
+                        <td>
+                            <span class="status status-pending"><i class="fas fa-university"></i> Virement</span>
+                        </td>
+                        <td><span class="status status-{{ order.status }}">{{ order.status|title }}</span></td>
+                        <td style="font-size:0.85rem;color:var(--text-muted);">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if order.status == 'pending' %}
+                            <div style="display:flex;flex-direction:column;gap:6px;">
+                                <form method="POST" action="{{ url_for('update_order_status', id=order.id) }}" style="display:inline;">
+                                    <input type="hidden" name="status" value="completed">
+                                    <button type="submit" class="btn-sm" style="background:rgba(34,197,94,0.15);color:var(--success);border:none;cursor:pointer;padding:6px 12px;border-radius:6px;width:100%;font-weight:600;"
+                                            onclick="return confirm('Confirm payment for this order? License keys will be delivered.');">
+                                        <i class="fas fa-check"></i> Confirmer le paiement
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('update_order_status', id=order.id) }}" style="display:inline;">
+                                    <input type="hidden" name="status" value="cancelled">
+                                    <button type="submit" class="btn-sm" style="background:rgba(239,68,68,0.15);color:var(--error);border:none;cursor:pointer;padding:6px 12px;border-radius:6px;width:100%;"
+                                            onclick="return confirm('Cancel this order?')">
+                                        <i class="fas fa-times"></i> Annuler
+                                    </button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <form method="POST" action="{{ url_for('update_order_status', id=order.id) }}" class="status-form">
+                                <select name="status" onchange="this.form.submit()">
+                                    <option value="pending" {{ 'selected' if order.status == 'pending' else '' }}>Pending</option>
+                                    <option value="completed" {{ 'selected' if order.status == 'completed' else '' }}>Complete</option>
+                                    <option value="cancelled" {{ 'selected' if order.status == 'cancelled' else '' }}>Cancel</option>
+                                </select>
+                            </form>
+                            {% endif %}
+                            {% if order.status == 'completed' %}
+                            <div class="license-keys" style="margin-top:8px;">
+                                {% for item in order.items %}
+                                    {% if item.license_key %}
+                                        <small style="color:var(--text-muted);">{{ item.product_name }} x{{ item.quantity }}:</small>
+                                        {% set keys = item.license_key.split('\n') %}
+                                        {% for key in keys %}
+                                            <code style="display:block;margin:2px 0;">{{ key }}</code>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('admin_delete_order', id=order.id) }}" style="margin-top:8px;">
+                                <button type="submit" class="btn-sm" style="background:rgba(239,68,68,0.1);color:var(--error);border:none;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:0.75rem;width:100%;"
+                                        onclick="return confirm('Delete order #{{ order.id }}? This cannot be undone.');">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="empty-cell">
+                            <i class="fas fa-shopping-cart"></i>
+                            <p>No orders found</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

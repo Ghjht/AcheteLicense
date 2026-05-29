@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} - AcheteLicense{% endblock %}
+{% block content %}
+<section class="product-detail">
+    <div class="detail-container">
+        <div class="detail-image">
+            <img src="{{ url_for('uploaded_file', filename=product.image_file) if product.image_file != 'default.png' else 'https://placehold.co/600x400/1a1a2e/e94560?text=' + product.name|urlencode }}"
+                 alt="{{ product.name }}"
+                 onerror="this.src='https://placehold.co/600x400/1a1a2e/e94560?text=Product'">
+        </div>
+        <div class="detail-info">
+            <span class="detail-category">{{ product.category }}</span>
+            <h1>{{ product.name }}</h1>
+            <div class="detail-meta">
+                <span class="detail-license"><i class="fas fa-tag"></i> {{ product.license_type|title }} License</span>
+                <span class="detail-stock">
+                    {% if product.quantity > 0 %}
+                    <i class="fas fa-check-circle" style="color:#22c55e;"></i> In Stock
+                    {% else %}
+                    <i class="fas fa-times-circle" style="color:#ef4444;"></i> Out of Stock
+                    {% endif %}
+                </span>
+            </div>
+            <p class="detail-description">{{ product.description or 'No description available.' }}</p>
+            <div class="detail-price">
+                <span class="price">DH {{ "%.2f"|format(product.price) }}</span>
+                <button class="btn btn-primary btn-lg" onclick="addToCart({{ product.id }})" {% if product.quantity <= 0 %}disabled{% endif %}>
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+            </div>
+            <div class="detail-features">
+                <div class="detail-feature">
+                    <i class="fas fa-bolt"></i>
+                    <span>Instant Delivery</span>
+                </div>
+                <div class="detail-feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure Transaction</span>
+                </div>
+                <div class="detail-feature">
+                    <i class="fas fa-undo"></i>
+                    <span>30-Day Returns</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

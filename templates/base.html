@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AcheteLicense - Digital Products{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=opt&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="nav-logo">
+                <i class="fas fa-key"></i> AcheteLicense
+            </a>
+            <div class="nav-menu">
+                <a href="{{ url_for('shop') }}" class="nav-link"><i class="fas fa-store"></i> Shop</a>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="{{ url_for('admin_products') }}" class="nav-link"><i class="fas fa-box"></i> Products</a>
+                        <a href="{{ url_for('admin_orders') }}" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
+                        <a href="{{ url_for('admin_users') }}" class="nav-link"><i class="fas fa-users"></i> Users</a>
+                    {% else %}
+                        <a href="{{ url_for('my_orders') }}" class="nav-link"><i class="fas fa-receipt"></i> My Orders</a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <span class="nav-user"><i class="fas fa-user"></i> {{ current_user.username }}</span>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    <a href="{{ url_for('register') }}" class="nav-link nav-register"><i class="fas fa-user-plus"></i> Register</a>
+                {% endif %}
+                <a href="{{ url_for('view_cart') }}" class="nav-link cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                            {{ message }}
+                            <button class="flash-close">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer" style="position:fixed;bottom:0;left:0;right:0;padding:12px 0;text-align:center;background:var(--bg-dark);border-top:1px solid var(--border);z-index:100;">
+        <p style="margin:0;font-size:0.85rem;color:var(--text-muted);">&copy; 2026 AcheteLicense. All rights reserved. | Secure Payments</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
